@@ -4,16 +4,14 @@ from pydantic import BaseModel
 from typing import Optional
 from fastapi import FastAPI, HTTPException
 
-
 # --- Import RAG Components ---
 # Adjust imports based on your specific libraries and document types
-from langchain_community.document_loaders import PyPDFLoader, TextLoader # Example loaders
+from langchain_community.document_loaders import PyPDFLoader, TextLoader  # Example loaders
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 # --- Use Google-specific imports ---
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
-from langchain_community.vectorstores import Chroma # Still using ChromaDB local vector store
+from langchain_community.vectorstores import Chroma  # Still using ChromaDB local vector store
 from langchain.chains import RetrievalQA
-
 
 # --- Configuration ---
 # Load environment variables from .env file
@@ -23,15 +21,14 @@ load_dotenv()
 # --- Correct variable name for Google API key ---
 LLM_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not LLM_API_KEY:
-     print("Error: GOOGLE_API_KEY not found in environment variables. Please set it in the .env file.")
-     # For local testing, you might print a message.
-     # In a production system, you'd likely want this check to prevent startup errors
-     # or handle missing keys more robustly.
-     # Example: raise ValueError("GOOGLE_API_KEY not found")
-
+    print("Error: GOOGLE_API_KEY not found in environment variables. Please set it in the .env file.")
+    # For local testing, you might print a message.
+    # In a production system, you'd likely want this check to prevent startup errors
+    # or handle missing keys more robustly.
+    # Example: raise ValueError("GOOGLE_API_KEY not found")
 
 document_directory = "./docs"
-persist_directory = "./chroma_db" # Directory to store the ChromaDB persistent data
+persist_directory = "./chroma_db"  # Directory to store the ChromaDB persistent data
 
 # --- Initialize FastAPI App ---
 app = FastAPI(
@@ -46,6 +43,7 @@ retrieval_qa_chain: Optional[RetrievalQA] = None
 embeddings_model: Optional[GoogleGenerativeAIEmbeddings] = None
 llm_model: Optional[ChatGoogleGenerativeAI] = None
 
+
 # --- Startup Event: Initialize RAG Components ---
 @app.on_event("startup")
 async def startup_event():
@@ -54,8 +52,8 @@ async def startup_event():
 
     # Ensure API key is available before proceeding
     if not LLM_API_KEY:
-         print("API key missing. Skipping RAG initialization. API endpoints will not work.")
-         return # Exit startup if key is missing
+        print("API key missing. Skipping RAG initialization. API endpoints will not work.")
+        return  # Exit startup if key is missing
 
     try:
         # --- RAG Setup Logic (Adapted for Google Models) ---
@@ -99,8 +97,8 @@ async def startup_event():
                 # Split Documents
                 print("Splitting documents into chunks...")
                 text_splitter = RecursiveCharacterTextSplitter(
-                    chunk_size=1000, # Experiment
-                    chunk_overlap=200 # Experiment
+                    chunk_size=1000,  # Experiment
+                    chunk_overlap=200  # Experiment
                 )
                 chunked_documents = text_splitter.split_documents(documents)
                 print(f"Split into {len(chunked_documents)} chunks.")
@@ -115,32 +113,31 @@ async def startup_event():
                 )
                 print("Indexing complete. Vector store saved.")
 
-
         # --- Initialize the LLM and QA Chain ---
         # Initialize the LLM model
-        if LLM_API_KEY: # Only initialize LLM if API key is present
-             # --- Use Google's Chat Model ---
-             # 'gemini-pro' is a common chat model name for Google GenAI
-             llm_model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.1, google_api_key=LLM_API_KEY)
-             print("Google LLM model initialized ('gemini-pro').")
+        if LLM_API_KEY:  # Only initialize LLM if API key is present
+            # --- Use Google's Chat Model ---
+            # 'gemini-pro' is a common chat model name for Google GenAI
+            llm_model = ChatGoogleGenerativeAI(model="models/gemini-1.5-pro", temperature=0.1, google_api_key=LLM_API_KEY)
+            print("Google LLM model initialized ('gemini-pro').")
 
-             # Create a retriever from the vector store if it was initialized
-             if vectorstore:
-                 retriever = vectorstore.as_retriever(search_kwargs={"k": 3}) # Retrieve top 3
-                 # Create the RAG chain
-                 retrieval_qa_chain = RetrievalQA.from_chain_type(
-                     llm_model,
-                     chain_type="stuff",
-                     retriever=retriever,
-                     return_source_documents=True # Optional
-                 )
-                 print("Retrieval QA chain initialized.")
-             else:
-                 print("Vector store is empty or failed to initialize. Retrieval QA chain not fully set up.")
-                 retrieval_qa_chain = None # Explicitly set to None
+            # Create a retriever from the vector store if it was initialized
+            if vectorstore:
+                retriever = vectorstore.as_retriever(search_kwargs={"k": 3})  # Retrieve top 3
+                # Create the RAG chain
+                retrieval_qa_chain = RetrievalQA.from_chain_type(
+                    llm_model,
+                    chain_type="stuff",
+                    retriever=retriever,
+                    return_source_documents=True  # Optional
+                )
+                print("Retrieval QA chain initialized.")
+            else:
+                print("Vector store is empty or failed to initialize. Retrieval QA chain not fully set up.")
+                retrieval_qa_chain = None  # Explicitly set to None
 
         else:
-             print("API key missing, LLM and QA chain not initialized.")
+            print("API key missing, LLM and QA chain not initialized.")
 
 
     except Exception as e:
@@ -152,9 +149,11 @@ async def startup_event():
         llm_model = None
         # Consider if the app should exit or run in a degraded state
 
+
 # --- Define Request Body Schema (Same as before) ---
 class QueryRequest(BaseModel):
     query: str
+
 
 # --- Define Response Body Schema (Optional - Same as before) ---
 # class AnswerResponse(BaseModel):
@@ -191,12 +190,13 @@ async def ask_document(request: QueryRequest):
         print("Query processed successfully.")
         # Return the answer in a JSON response
         # return AnswerResponse(answer=answer)#, source_documents=formatted_sources)
-        return {"answer": answer} # Simple dictionary response
+        return {"answer": answer}  # Simple dictionary response
 
     except Exception as e:
         print(f"Error processing query: {e}")
         # Return an HTTP exception
         raise HTTPException(status_code=500, detail=f"An error occurred while processing your query: {e}")
+
 
 # --- Optional: Root Endpoint (Same as before) ---
 @app.get("/")
