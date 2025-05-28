@@ -1,0 +1,60 @@
+# ===================================================================
+# Code Documentation Assistant - Environment Configuration Template
+# ===================================================================
+# 
+# INSTRUCTIONS:
+# 1. Copy this file to .env: cp env_template.txt .env
+# 2. Replace the placeholder values with your actual API keys
+# 3. Never commit the .env file to version control
+#
+# ===================================================================
+
+# === REQUIRED API KEYS ===
+# Google Gemini API Key (Required for LLM and embeddings)
+# Get from: https://makersuite.google.com/app/apikey
+GOOGLE_API_KEY=your_google_api_key_here
+
+# === OPTIONAL API KEYS ===
+# OpenAI API Key (Optional - for alternative LLM models)
+# Get from: https://platform.openai.com/api-keys
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Pinecone API Key (Optional - for cloud vector storage)
+# Get from: https://app.pinecone.io/
+PINECONE_API_KEY=your_pinecone_api_key_here
+PINECONE_ENVIRONMENT=your_pinecone_environment_here
+
+# === APPLICATION SETTINGS ===
+# Debug mode (true/false)
+DEBUG=false
+
+# === DATABASE CONFIGURATION ===
+# Database URL (SQLite by default, can use PostgreSQL for production)
+DATABASE_URL=sqlite:///./code_assistant.db
+
+# Redis URL for caching (optional)
+REDIS_URL=redis://localhost:6379
+
+# === DEVELOPMENT SETTINGS ===
+# Set to true for development
+DEV_MODE=true
+
+# Log level (DEBUG, INFO, WARNING, ERROR)
+LOG_LEVEL=INFO
+
+# === SECURITY SETTINGS ===
+# Secret key for session management (generate a secure random string)
+SECRET_KEY=your_secret_key_here
+
+# === PERFORMANCE SETTINGS ===
+# Maximum number of concurrent file processing
+MAX_CONCURRENT_FILES=10
+
+# Cache TTL in hours
+CACHE_TTL_HOURS=24
+
+# === EXAMPLE VALUES (for reference) ===
+# GOOGLE_API_KEY=AIzaSyD...your_actual_key_here
+# OPENAI_API_KEY=sk-...your_actual_key_here
+# PINECONE_API_KEY=12345678-1234-1234-1234-123456789abc
+# PINECONE_ENVIRONMENT=us-west1-gcp 
