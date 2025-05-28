@@ -3,7 +3,7 @@
 from typing import List, Dict, Optional, Any, Union, Literal
 from datetime import datetime
 from pathlib import Path
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from enum import Enum
 
 
@@ -64,16 +64,18 @@ class FileInfo(BaseModel):
     git_hash: Optional[str] = None
     encoding: str = "utf-8"
     
-    @validator("path", pre=True)
+    @field_validator("path", mode="before")
+    @classmethod
     def validate_path(cls, v):
         if isinstance(v, str):
             return Path(v)
         return v
     
-    @validator("language", pre=True)
-    def infer_language(cls, v, values):
-        if v is None and "extension" in values:
-            ext = values["extension"].lower()
+    @field_validator("language", mode="before")
+    @classmethod
+    def infer_language(cls, v, info):
+        if v is None and "extension" in info.data:
+            ext = info.data["extension"].lower()
             language_map = {
                 ".py": LanguageType.PYTHON,
                 ".js": LanguageType.JAVASCRIPT,
@@ -121,7 +123,8 @@ class CodeElement(BaseModel):
     dependencies: List[str] = Field(default_factory=list)  # Imported modules/functions
     complexity_score: Optional[float] = None
     
-    @validator("file_path", pre=True)
+    @field_validator("file_path", mode="before")
+    @classmethod
     def validate_file_path(cls, v):
         if isinstance(v, str):
             return Path(v)
@@ -167,7 +170,8 @@ class DocumentChunk(BaseModel):
     element_type: Optional[CodeElementType] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
     
-    @validator("file_path", pre=True)
+    @field_validator("file_path", mode="before")
+    @classmethod
     def validate_file_path(cls, v):
         if isinstance(v, str):
             return Path(v)
@@ -230,7 +234,8 @@ class RepositoryInfo(BaseModel):
     total_lines: int = 0
     last_analyzed: Optional[datetime] = None
     
-    @validator("path", pre=True)
+    @field_validator("path", mode="before")
+    @classmethod
     def validate_path(cls, v):
         if isinstance(v, str):
             return Path(v)
@@ -251,9 +256,10 @@ class DocumentationRequest(BaseModel):
     include_return_type: bool = True
     style: Literal["google", "numpy", "sphinx", "markdown"] = "google"
     
-    @validator("target", pre=True)
+    @field_validator("target", mode="before")
+    @classmethod
     def validate_target(cls, v):
-        if isinstance(v, str) and v.startswith("/") or "\\" in v:
+        if isinstance(v, str) and (v.startswith("/") or "\\" in v):
             return Path(v)
         return v
     
@@ -287,7 +293,8 @@ class APIEndpoint(BaseModel):
     description: Optional[str] = None
     tags: List[str] = Field(default_factory=list)
     
-    @validator("file_path", pre=True)
+    @field_validator("file_path", mode="before")
+    @classmethod
     def validate_file_path(cls, v):
         if isinstance(v, str):
             return Path(v)

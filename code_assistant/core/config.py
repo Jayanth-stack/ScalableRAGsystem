@@ -2,7 +2,7 @@
 
 import os
 from typing import List, Optional, Dict, Any
-from pydantic import BaseSettings, Field, validator
+from pydantic import BaseSettings, Field, field_validator
 from pathlib import Path
 
 
@@ -66,7 +66,8 @@ class Settings(BaseSettings):
         ".venv", "venv", "*.log", ".DS_Store"
     ]
     
-    @validator("base_directory", pre=True)
+    @field_validator("base_directory", mode="before")
+    @classmethod
     def validate_base_directory(cls, v):
         """Ensure base directory exists."""
         if isinstance(v, str):
@@ -74,7 +75,8 @@ class Settings(BaseSettings):
         v.mkdir(parents=True, exist_ok=True)
         return v
     
-    @validator("supported_languages")
+    @field_validator("supported_languages")
+    @classmethod
     def validate_languages(cls, v):
         """Ensure supported languages are lowercase."""
         return [lang.lower() for lang in v]

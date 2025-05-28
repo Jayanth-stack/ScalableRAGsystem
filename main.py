@@ -32,8 +32,8 @@ persist_directory = "./chroma_db"  # Directory to store the ChromaDB persistent 
 
 # --- Initialize FastAPI App ---
 app = FastAPI(
-    title="Document RAG Q&A API (Google Gemini)",
-    description="API for asking questions about documents using RAG with Google Gemini.",
+    title="Code Documentation Assistant (Google Gemini)",
+    description="Creating and modularizing codebases using RAG with Google Gemini.",
     version="1.0.0",
 )
 
