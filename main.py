@@ -45,8 +45,8 @@ llm_model: Optional[ChatGoogleGenerativeAI] = None
 
 
 # --- Startup Event: Initialize RAG Components ---
-@app.on_event("startup")
-async def startup_event():
+
+async def lifespan(app: FastAPI):
     print("FastAPI app startup: Initializing RAG components with Google Gemini...")
     global vectorstore, retrieval_qa_chain, embeddings_model, llm_model
 

@@ -2,12 +2,20 @@
 
 import os
 from typing import List, Optional, Dict, Any
-from pydantic import BaseSettings, Field, field_validator
+from pydantic import Field, field_validator, ConfigDict
+from pydantic_settings import BaseSettings
 from pathlib import Path
 
 
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
+    
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore"  # Ignore extra environment variables
+    )
     
     # === API Configuration ===
     google_api_key: str = Field(..., env="GOOGLE_API_KEY")
@@ -115,11 +123,6 @@ class Settings(BaseSettings):
             if file_ext in lang_extensions:
                 return language
         return None
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
 
 
 # Global settings instance
