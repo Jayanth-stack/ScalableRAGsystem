@@ -1,6 +1,6 @@
 """Type definitions and data models for Code Documentation Assistant."""
 
-from typing import List, Dict, Optional, Any, Union, Literal
+from typing import List, Dict, Optional, Any, Union, Literal, Tuple
 from datetime import datetime
 from pathlib import Path
 from pydantic import BaseModel, Field, field_validator
@@ -155,6 +155,16 @@ class AnalysisResult(BaseModel):
     
     class Config:
         use_enum_values = True
+
+
+class ComplexityMetrics(BaseModel):
+    cyclomatic: float
+    halstead: float
+    maintainability: float
+
+class DependencyGraph(BaseModel):
+    nodes: List[str]
+    edges: List[Tuple[str, str]]
 
 
 class DocumentChunk(BaseModel):
