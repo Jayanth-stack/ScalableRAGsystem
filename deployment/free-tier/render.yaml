@@ -1,0 +1,21 @@
+# Render.com Blueprint - Alternative to Railway
+services:
+  # Backend API (Free tier - 512MB RAM)
+  - type: web
+    name: code-assistant-api
+    runtime: docker
+    dockerfilePath: ./deployment/free-tier/Dockerfile.render
+    plan: free  # Free tier!
+    buildCommand: docker build -t code-assistant-api .
+    startCommand: uvicorn code_assistant.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false  # Set manually in dashboard
+      - key: DATABASE_URL
+        value: sqlite:///./data/app.db
+      - key: PYTHON_VERSION
+        value: 3.11
+    healthCheckPath: /health
+    autoDeploy: true  # Auto deploy on git push
+
+# No database needed - using SQLite file storage

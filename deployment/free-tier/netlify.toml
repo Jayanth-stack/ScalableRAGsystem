@@ -1,0 +1,29 @@
+# Netlify configuration for frontend (alternative to Vercel)
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NEXT_PUBLIC_API_URL = "https://code-assistant.fly.dev"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://code-assistant.fly.dev/api/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Optimize images
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Enable preview deploys
+[context.deploy-preview]
+  command = "npm run build"

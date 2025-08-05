@@ -1,0 +1,26 @@
+# Optimized for Railway.app free tier (512MB RAM limit)
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install only essential dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy and install minimal requirements
+COPY deployment/free-tier/requirements-minimal.txt .
+RUN pip install --no-cache-dir -r requirements-minimal.txt
+
+# Copy application code
+COPY code_assistant/ ./code_assistant/
+COPY sample_repos/ ./sample_repos/
+
+# Use SQLite instead of PostgreSQL for free tier
+ENV DATABASE_URL="sqlite:///./app.db"
+ENV REDIS_URL=""  # No Redis in free tier
+
+# Railway provides PORT env variable
+EXPOSE $PORT
+
+CMD uvicorn code_assistant.api:app --host 0.0.0.0 --port $PORT
